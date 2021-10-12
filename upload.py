@@ -2,6 +2,7 @@ from yaml.error import YAMLError
 import pyodbc
 import yaml
 import pandas as pd
+#from sqlachemy import create_engine
 
 # List of dataframes to upload
 df_list = []
@@ -32,6 +33,9 @@ db = pyodbc.connect(driver = _driver,
 
 cursor = db.cursor()
 
+# if using sqlalchemy
+#cursor = create_engine(f'mysql+pyodbc://{_uid}:{_pwd}@{_server}/{_database}?driver={_driver}')
+
 def get_column_datatypes(data_types):
     data_list = []
     for x in data_types:
@@ -61,6 +65,9 @@ for table_name, df in tables.items():
     for index, row in df.iterrows():
         cursor.execute(f''' INSERT INTO {table_name} ({insert_table_column}) values({values}))'''
         , row.tolist())
+
+    # if using the to_sql method from sqlalchemy
+    #df.to_sql(table_name, cursor, schema = 'raw', if_exists='replace', index=False)
 
 db.commit()
 cursor.close
